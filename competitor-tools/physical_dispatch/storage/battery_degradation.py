@@ -58,6 +58,7 @@ class Degradation:
                 self.sidx += 1
         self.dt = self.times[1] - self.times[0]
         self.dt_interval = self.times[-1] - self.t_start
+        self.currents = self.currents[:,self.sidx:]
         degradation_costs = {}  # np.zeros(len(self.rids))
         for k in range(len(self.rids)):
             # Compute all of the parameters, then find the degradation cost
@@ -66,7 +67,7 @@ class Degradation:
                 # Compute again to get the starting SoH value (self.f_start)
                 self.dSoH_dt = (np.exp(-self.f_start) - np.exp(-self.f)) / (self.t_start - self.times[-1])
                 # Eqn 120 (give or take) in model_formulations_v1-1
-                degradation_costs[self.rids[k]] = self.C_EoL[k] * self.dSoH_dt * (self.times[-1] - self.times[0])
+                degradation_costs[self.rids[k]] = self.C_EoL[k] * self.dSoH_dt * (self.times[-1] - self.t_start)
             elif method=='component':
                 self.calculate_cost_cyc(k)
                 self.calculate_cost_therm(k)
@@ -308,7 +309,9 @@ def test_multiday():
         # Compute the degradation cost
         battery_deg = Degradation(soc_array, temp_array, current_array, times_array, t_start, resource_str)
         deg_costs = battery_deg.compute_degradation_cost()
-        print(f"Degradation Cost on day {d + 1} is ${deg_costs}")
+        print(f"Degradation Cost (component) on day {d + 1} is ${deg_costs}")
+        deg_costs = battery_deg.compute_degradation_cost(method='analytic')
+        print(f"Degradation Cost (analytic) on day {d + 1} is ${deg_costs}")
 
 if __name__ == '__main__':
-    test_one_day()
+    test_multiday()
