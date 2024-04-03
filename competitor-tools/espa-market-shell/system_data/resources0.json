@@ -4,7 +4,7 @@
     "time_limit": 720,
     "status": {
         "R00229": {
-            "soc": 500.0,
+            "soc": 480.0,
             "temp": 20.0,
             "dispatch": 0.0,
             "degradation": {}
